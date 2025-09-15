@@ -284,9 +284,9 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color: Colors.blueGrey.shade600,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Colors.red.shade800),
+                    border: Border.all(color: Colors.blueGrey.shade800),
                   ),
                   child: Text(
                     'LEAKS: $_totalLeaks',
@@ -306,8 +306,8 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                 ),
                 decoration: BoxDecoration(
                   color: (_leakTrackerActive && LeakTracking.isStarted)
-                      ? (_totalLeaks > 0 ? Colors.red.shade700 : Colors.green)
-                      : Colors.orange,
+                      ? (_totalLeaks > 0 ? Colors.blueGrey.shade700 : Colors.green)
+                      : Colors.blueGrey.shade500,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -361,7 +361,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      'Max: ',
+                      'Peak: ',
                       style: textTheme.bodyMedium?.copyWith(
                         color: Colors.grey.shade600,
                         fontSize: 11, // Slightly smaller to fit better
@@ -408,8 +408,11 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                               gradient: LinearGradient(
                                 colors: <Color>[
                                   Colors.green,
-                                  if (_memoryAnimation.value > 0.7) Colors.orange else Colors.green,
-                                  if (_memoryAnimation.value > 0.9) Colors.red else Colors.orange,
+                                  if (_memoryAnimation.value > 0.7) Colors.blueGrey.shade400 else Colors.green,
+                                  if (_memoryAnimation.value > 0.9)
+                                    Colors.blueGrey.shade600
+                                  else
+                                    Colors.blueGrey.shade400,
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(4),
@@ -471,7 +474,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                     width: 2,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.red.shade600,
+                      color: Colors.blueGrey.shade600,
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),
@@ -479,7 +482,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                   Text(
                     'Memory Leaks',
                     style: textTheme.bodySmall?.copyWith(
-                      color: Colors.red.shade700,
+                      color: Colors.blueGrey.shade700,
                       fontSize: 9,
                       fontWeight: FontWeight.w500,
                     ),
@@ -494,10 +497,10 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: _totalLeaks > 0 ? Colors.red.shade50 : Colors.grey.shade50,
+                  color: _totalLeaks > 0 ? Colors.blueGrey.shade50 : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(
-                    color: _totalLeaks > 0 ? Colors.red.shade200 : Colors.grey.shade200,
+                    color: _totalLeaks > 0 ? Colors.blueGrey.shade200 : Colors.grey.shade200,
                   ),
                 ),
                 child: Column(
@@ -508,7 +511,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                       style: textTheme.bodySmall?.copyWith(
                         fontSize: 8,
                         fontWeight: FontWeight.w600,
-                        color: _totalLeaks > 0 ? Colors.red.shade700 : Colors.grey.shade700,
+                        color: _totalLeaks > 0 ? Colors.blueGrey.shade700 : Colors.grey.shade700,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -518,7 +521,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                           : 'Pattern Analysis: $_totalLeaks suspicious | Method: Memory Growth Detection',
                       style: textTheme.bodySmall?.copyWith(
                         fontSize: 8,
-                        color: _totalLeaks > 0 ? Colors.red.shade600 : Colors.grey.shade600,
+                        color: _totalLeaks > 0 ? Colors.blueGrey.shade600 : Colors.grey.shade600,
                       ),
                     ),
                     if (_totalLeaks > 0) ...<Widget>[
@@ -527,7 +530,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
                         'Check red triangular markers on graph for leak locations',
                         style: textTheme.bodySmall?.copyWith(
                           fontSize: 7,
-                          color: Colors.red.shade500,
+                          color: Colors.blueGrey.shade500,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -552,8 +555,8 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
 
     final double percentage = (_currentMemoryMB / _maxMemoryMB).clamp(0.0, 1.0);
 
-    if (percentage > 0.9) return Colors.red; // >90% of peak usage
-    if (percentage > 0.7) return Colors.orange; // >70% of peak usage
+    if (percentage > 0.9) return Colors.blueGrey.shade600; // >90% of peak usage
+    if (percentage > 0.7) return Colors.blueGrey.shade400; // >70% of peak usage
     return Colors.green; // <70% of peak usage
   }
 
@@ -575,7 +578,7 @@ class _AnimatedMemoryMonitorState extends State<AnimatedMemoryMonitor> with Tick
           backgroundColor: Colors.grey.shade300,
           // Enhanced with professional leak tracking indicators
           leakHistory: _leakHistory,
-          leakColor: Colors.red.shade600,
+          leakColor: Colors.blueGrey.shade600,
         ),
       ),
     );

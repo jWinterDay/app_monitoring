@@ -198,8 +198,8 @@ class _CircularRebuildTrackerState extends State<CircularRebuildTracker> with Ti
 
   Color _getRebuildColor() {
     // Color based on rebuilds per second
-    if (_rebuildsPerSecond > 30) return Colors.red; // Red: Too many rebuilds
-    if (_rebuildsPerSecond > 15) return Colors.orange; // Orange: Moderate rebuilds
+    if (_rebuildsPerSecond > 30) return Colors.blueGrey.shade700; // High: Too many rebuilds
+    if (_rebuildsPerSecond > 15) return Colors.blueGrey.shade500; // Moderate rebuilds
     if (_rebuildsPerSecond > 5) return Colors.blue; // Blue: Some rebuilds
     return Colors.green; // Green: Few rebuilds
   }

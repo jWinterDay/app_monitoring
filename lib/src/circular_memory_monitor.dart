@@ -129,7 +129,7 @@ class _CircularMemoryMonitorState extends State<CircularMemoryMonitor> with Tick
   }
 
   /// Perform async leak check using the correct API
-  /// COORDINATION FIX: Use only checkLeaks() to avoid interfering with RealTimeLeakMonitor
+  /// COORDINATION FIX: Use only checkLeaks() to avoid interfering with RealTimeMemoryMonitor
   /// which uses collectLeaks() and consumes/clears the leaked objects
   Future<void> _performAsyncLeakCheck() async {
     try {
@@ -138,7 +138,7 @@ class _CircularMemoryMonitorState extends State<CircularMemoryMonitor> with Tick
       }
 
       // Use ONLY checkLeaks() for non-destructive monitoring
-      // This prevents interference with RealTimeLeakMonitor's collectLeaks() calls
+      // This prevents interference with RealTimeMemoryMonitor's collectLeaks() calls
       final LeakSummary summary = await LeakTracking.checkLeaks();
       final int currentLeakCount = summary.total;
 
@@ -261,7 +261,7 @@ class _CircularMemoryMonitorState extends State<CircularMemoryMonitor> with Tick
                   // Leak tracker information - Applies TRIZ LOCAL QUALITY: Compact leak display
                   if (_leakTrackerActive)
                     Text(
-                      '$_totalLeaks leaks',
+                      '$_totalLeaks',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: _getLeakColor(),
                             fontWeight: FontWeight.w500,
@@ -289,16 +289,16 @@ class _CircularMemoryMonitorState extends State<CircularMemoryMonitor> with Tick
   Color _getMemoryColor() {
     final double percentage = _currentMemoryMB / _maxExpectedMemoryMB;
 
-    if (percentage > 0.9) return Colors.red;
-    if (percentage > 0.7) return Colors.orange;
+    if (percentage > 0.9) return Colors.blueGrey.shade700;
+    if (percentage > 0.7) return Colors.blueGrey.shade500;
     return Colors.green;
   }
 
   /// Get leak indicator color - Applies TRIZ LOCAL QUALITY: Visual leak severity indication
   Color _getLeakColor() {
     if (_totalLeaks == 0) return Colors.green;
-    if (_totalLeaks <= 5) return Colors.orange;
-    return Colors.red;
+    if (_totalLeaks <= 5) return Colors.blueGrey.shade500;
+    return Colors.blueGrey.shade700;
   }
 
   @override

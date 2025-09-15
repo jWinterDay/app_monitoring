@@ -7,16 +7,16 @@ import 'package:flutter/material.dart';
 
 import 'leakable_widgets.dart';
 
-/// Memory leak simulator widget for testing leak detection
-/// UNIVERSALITY (multiple leak types), PRIOR COUNTERACTION (controlled testing)
-class MemoryLeakSimulator extends StatefulWidget {
-  const MemoryLeakSimulator({super.key});
+/// Memory concern simulator widget for testing memory monitoring
+/// UNIVERSALITY (multiple concern types), PRIOR COUNTERACTION (controlled testing)
+class MemoryConcernSimulator extends StatefulWidget {
+  const MemoryConcernSimulator({super.key});
 
   @override
-  State<MemoryLeakSimulator> createState() => _MemoryLeakSimulatorState();
+  State<MemoryConcernSimulator> createState() => _MemoryConcernSimulatorState();
 }
 
-class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
+class _MemoryConcernSimulatorState extends State<MemoryConcernSimulator> {
   // Static collections to simulate leaks that persist beyond widget lifecycle
   static final List<Timer> _leakedTimers = <Timer>[];
   static final List<StreamSubscription<dynamic>> _leakedSubscriptions = <StreamSubscription<dynamic>>[];
@@ -43,7 +43,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Memory Leak Simulation (Testing)',
+          'Memory Concern Simulation (Testing)',
           style: textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.purple.shade700,
@@ -64,7 +64,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '📋 Instructions for testing leak detection:',
+                    '📋 Instructions for testing memory monitoring:',
                     style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                       color: Colors.purple.shade700,
                       fontWeight: FontWeight.bold,
@@ -72,7 +72,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '1. Click "Create Widget Leak" or "Create Memory Leak"',
+                    '1. Click "Create Widget Concern" or "Create Memory Concern"',
                     style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                       color: Colors.purple.shade600,
                       fontSize: 11,
@@ -86,14 +86,14 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                     ),
                   ),
                   Text(
-                    '3. Click "Hide Widgets" to trigger dispose() and create leaks',
+                    '3. Click "Hide Widgets" to trigger dispose() and create retention issues',
                     style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                       color: Colors.purple.shade600,
                       fontSize: 11,
                     ),
                   ),
                   Text(
-                    '4. Check the real-time leak monitor above for detected leaks! 🔍',
+                    '4. Check the real-time monitor above for detected concerns! 🔍',
                     style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                       color: Colors.purple.shade600,
                       fontSize: 11,
@@ -107,9 +107,9 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
               // Timer Leak Simulation
               _buildLeakButton(
                 context,
-                'Create Timer Leak',
+                'Create Timer Concern',
                 Icons.timer,
-                Colors.red,
+                Colors.blueGrey.shade600,
                 _createTimerLeak,
                 'Creates uncancelled timers that will persist',
               ),
@@ -117,9 +117,9 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
               // Stream Subscription Leak
               _buildLeakButton(
                 context,
-                'Create Stream Leak',
+                'Create Stream Concern',
                 Icons.stream,
-                Colors.orange,
+                Colors.blueGrey.shade500,
                 _createStreamLeak,
                 'Creates unsubscribed stream subscriptions',
               ),
@@ -127,7 +127,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
               // Widget Reference Leak
               _buildLeakButton(
                 context,
-                'Create Widget Leak',
+                'Create Widget Concern',
                 Icons.widgets,
                 Colors.blue,
                 _createWidgetLeak,
@@ -137,7 +137,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
               // Memory Chunk Leak
               _buildLeakButton(
                 context,
-                'Create Memory Leak',
+                'Create Memory Concern',
                 Icons.memory,
                 Colors.green,
                 _createMemoryLeak,
@@ -147,11 +147,11 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
               // Multiple Leaks
               _buildLeakButton(
                 context,
-                'Create Multiple Leaks',
+                'Create Multiple Concerns',
                 Icons.bug_report,
                 Colors.purple,
                 _createMultipleLeaks,
-                'Creates several different types of leaks',
+                'Creates several different types of memory concerns',
               ),
 
               const SizedBox(height: 8),
@@ -167,7 +167,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Simulated Leaks:',
+                      'Simulated Concerns:',
                       style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -191,7 +191,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
               TextButton.icon(
                 onPressed: _clearAllLeaks,
                 icon: const Icon(Icons.cleaning_services, size: 16),
-                label: const Text('Clear All Simulated Leaks'),
+                label: const Text('Clear All Simulated Concerns'),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.green.shade700,
                   alignment: Alignment.centerLeft,
@@ -204,9 +204,9 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                    border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(4),
-                    color: Colors.red.withValues(alpha: 0.05),
+                    color: Colors.blueGrey.withValues(alpha: 0.05),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +215,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                         'Active Leakable Widgets (for leak_tracker detection):',
                         style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.red.shade700,
+                          color: Colors.blueGrey.shade700,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -226,7 +226,7 @@ class _MemoryLeakSimulatorState extends State<MemoryLeakSimulator> {
                         icon: const Icon(Icons.visibility_off, size: 14),
                         label: const Text('Hide Widgets (Trigger Dispose)'),
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.red.shade700,
+                          foregroundColor: Colors.blueGrey.shade700,
                           alignment: Alignment.centerLeft,
                         ),
                       ),

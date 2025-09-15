@@ -239,7 +239,7 @@ class _AnimatedCpuProfilerState extends State<AnimatedCpuProfiler> with TickerPr
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      'Max: ',
+                      'Peak: ',
                       style: textTheme.bodyMedium?.copyWith(
                         color: Colors.grey.shade600,
                         fontSize: 11, // Slightly smaller to fit better
@@ -299,8 +299,8 @@ class _AnimatedCpuProfilerState extends State<AnimatedCpuProfiler> with TickerPr
                               gradient: LinearGradient(
                                 colors: <Color>[
                                   Colors.grey.shade700,
-                                  if (_cpuAnimation.value > 0.7) Colors.orange else Colors.grey.shade700,
-                                  if (_cpuAnimation.value > 0.9) Colors.red else Colors.orange,
+                                  if (_cpuAnimation.value > 0.7) Colors.blueGrey.shade400 else Colors.grey.shade700,
+                                  if (_cpuAnimation.value > 0.9) Colors.blueGrey.shade600 else Colors.blueGrey.shade400,
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(4),
@@ -347,8 +347,8 @@ class _AnimatedCpuProfilerState extends State<AnimatedCpuProfiler> with TickerPr
   Color _getCpuColor() {
     final double percentage = _currentCpuPercent / _maxExpectedCpuPercent;
 
-    if (percentage > 0.9) return Colors.red;
-    if (percentage > 0.7) return Colors.orange;
+    if (percentage > 0.9) return Colors.blueGrey.shade600;
+    if (percentage > 0.7) return Colors.blueGrey.shade400;
     return Colors.grey.shade700;
   }
 

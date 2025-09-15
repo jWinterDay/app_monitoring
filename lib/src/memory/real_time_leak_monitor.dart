@@ -7,31 +7,31 @@ import 'package:leak_tracker/leak_tracker.dart';
 
 import 'leak_location.dart';
 
-/// Real-time memory leak monitor widget
+/// Real-time memory concern monitor widget
 /// Applies TRIZ principles: SELF-SERVICE (autonomous monitoring),
 /// LOCAL QUALITY (optimized real-time display), PRIOR COUNTERACTION (error handling),
 /// UNIVERSALITY (reusable monitoring pattern)
-class RealTimeLeakMonitor extends StatefulWidget {
-  const RealTimeLeakMonitor({super.key});
+class RealTimeMemoryMonitor extends StatefulWidget {
+  const RealTimeMemoryMonitor({super.key});
 
   @override
-  State<RealTimeLeakMonitor> createState() => _RealTimeLeakMonitorState();
+  State<RealTimeMemoryMonitor> createState() => _RealTimeMemoryMonitorState();
 }
 
-class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
+class _RealTimeMemoryMonitorState extends State<RealTimeMemoryMonitor> {
   Timer? _monitoringTimer;
-  LeakSummary? _currentLeakSummary;
-  Leaks? _currentLeaksDetailed;
+  LeakSummary? _currentMemorySummary;
+  Leaks? _currentMemoryDetailed;
   String _statusMessage = 'Initializing...';
   Color _statusColor = Colors.grey;
   DateTime? _lastCheck;
   DateTime? _lastDetailedCheck;
   bool _isMonitoring = false;
   bool _isManualGcInProgress = false;
-  Map<String, int> _leaksByType = <String, int>{};
-  List<String> _leakRecommendations = <String>[];
+  Map<String, int> _concernsByType = <String, int>{};
+  List<String> _memoryRecommendations = <String>[];
   String _severityLevel = 'Unknown';
-  Map<String, List<LeakLocation>> _leaksByFile = <String, List<LeakLocation>>{};
+  Map<String, List<LeakLocation>> _concernsByFile = <String, List<LeakLocation>>{};
 
   // Pagination state - tracks current page for each file
   final Map<String, int> _currentPageByFile = <String, int>{};
@@ -51,12 +51,12 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
 
   void _startMonitoring() {
     // Initial check
-    _checkLeaks();
+    _checkMemory();
 
     // Set up periodic monitoring (every 2 seconds for real-time updates)
     _monitoringTimer = Timer.periodic(const Duration(seconds: 2), (_) {
       if (mounted) {
-        _checkLeaks();
+        _checkMemory();
       }
     });
 
@@ -65,14 +65,14 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
     });
   }
 
-  /// Non-destructive leak checking - does NOT trigger garbage collection
+  /// Non-destructive memory checking - does NOT trigger garbage collection
   /// GC COORDINATION FIX: Only uses checkLeaks() to avoid automatic GC triggering
-  Future<void> _checkLeaks() async {
+  Future<void> _checkMemory() async {
     try {
       if (!LeakTracking.isStarted) {
         setState(() {
-          _statusMessage = 'Leak Tracker Not Started';
-          _statusColor = Colors.orange;
+          _statusMessage = 'Memory Tracker Not Started';
+          _statusColor = Colors.grey.shade600;
           _lastCheck = DateTime.now();
         });
         return;
@@ -83,26 +83,26 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
       final String severity = _calculateSeverity(leakSummary.total);
 
       setState(() {
-        _currentLeakSummary = leakSummary;
+        _currentMemorySummary = leakSummary;
         _severityLevel = severity;
         _lastCheck = DateTime.now();
 
         if (leakSummary.total == 0) {
-          _statusMessage = 'No Leaks Detected ✅';
+          _statusMessage = 'No Memory Concerns Detected ✅';
           _statusColor = Colors.green;
         } else {
           _statusMessage =
-              '🚨 ${leakSummary.total} Leak${leakSummary.total > 1 ? 's' : ''} Detected ($severity) - Use "Analyze Details" for more info';
+              '🚨 ${leakSummary.total} Memory Concern${leakSummary.total > 1 ? 's' : ''} Detected ($severity) - Use "Analyze Details" for more info';
           _statusColor = _getSeverityColor(severity);
         }
       });
     } on Exception catch (e) {
       setState(() {
         _statusMessage = 'Error: $e';
-        _statusColor = Colors.red;
+        _statusColor = Colors.grey.shade700;
         _lastCheck = DateTime.now();
       });
-      developer.log('Real-time leak check error: $e');
+      developer.log('Real-time memory check error: $e');
     }
   }
 
@@ -118,8 +118,8 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
     try {
       if (!LeakTracking.isStarted) {
         setState(() {
-          _statusMessage = 'Leak Tracker Not Started';
-          _statusColor = Colors.orange;
+          _statusMessage = 'Memory Tracker Not Started';
+          _statusColor = Colors.grey.shade600;
           _isManualGcInProgress = false;
         });
         return;
@@ -149,11 +149,11 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
           _resetPagination();
         }
 
-        _currentLeakSummary = leakSummary;
-        _currentLeaksDetailed = detailedLeaks;
-        _leaksByType = leaksByType;
-        _leaksByFile = leaksByFile;
-        _leakRecommendations = recommendations;
+        _currentMemorySummary = leakSummary;
+        _currentMemoryDetailed = detailedLeaks;
+        _concernsByType = leaksByType;
+        _concernsByFile = leaksByFile;
+        _memoryRecommendations = recommendations;
         _severityLevel = severity;
         _lastCheck = DateTime.now();
         _lastDetailedCheck = DateTime.now();
@@ -163,22 +163,22 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
         _adjustPaginationBounds();
 
         if (detailedLeaks.total == 0) {
-          _statusMessage = 'No Leaks After GC ✅ (Detailed Analysis Complete)';
+          _statusMessage = 'No Memory Concerns After GC ✅ (Detailed Analysis Complete)';
           _statusColor = Colors.green;
         } else {
           _statusMessage =
-              '🚨 ${detailedLeaks.total} True Leak${detailedLeaks.total > 1 ? 's' : ''} Found ($severity) - Post-GC Analysis';
+              '🚨 ${detailedLeaks.total} Memory Concern${detailedLeaks.total > 1 ? 's' : ''} Found ($severity) - Post-GC Analysis';
           _statusColor = _getSeverityColor(severity);
         }
       });
     } on Exception catch (e) {
       setState(() {
         _statusMessage = 'Detailed analysis error: $e';
-        _statusColor = Colors.red;
+        _statusColor = Colors.grey.shade700;
         _lastCheck = DateTime.now();
         _isManualGcInProgress = false;
       });
-      developer.log('Manual detailed leak analysis error: $e');
+      developer.log('Manual detailed memory analysis error: $e');
     }
   }
 
@@ -284,7 +284,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Live monitoring shows potential leaks. Click "Analyze Details" to trigger GC and find true leaks.',
+                      'Live monitoring shows potential memory concerns. Click "Analyze Details" to trigger GC and find active concerns.',
                       style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
                         color: Colors.blue.shade700,
                         fontSize: 10,
@@ -299,9 +299,9 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
           const SizedBox(height: 8),
 
           // Detailed information
-          if (LeakTracking.isStarted && _currentLeakSummary != null) ...<Widget>[
+          if (LeakTracking.isStarted && _currentMemorySummary != null) ...<Widget>[
             // Human-readable leak analysis
-            if (_currentLeakSummary!.total > 0) ...<Widget>[
+            if (_currentMemorySummary!.total > 0) ...<Widget>[
               // Severity and overview
               Row(
                 children: <Widget>[
@@ -323,15 +323,15 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               const SizedBox(height: 8),
 
               // Leak types breakdown
-              if (_leaksByType.isNotEmpty) ...<Widget>[
+              if (_concernsByType.isNotEmpty) ...<Widget>[
                 Text(
-                  'Leak Types:',
+                  'Memory Concern Types:',
                   style: (textTheme.labelMedium ?? const TextStyle()).copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
-                ...(_leaksByType.entries.map(
+                ...(_concernsByType.entries.map(
                   (MapEntry<String, int> entry) => Padding(
                     padding: const EdgeInsets.only(left: 8, bottom: 2),
                     child: Row(
@@ -339,13 +339,13 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                         Icon(
                           _getLeakTypeIcon(entry.key),
                           size: 14,
-                          color: Colors.orange.shade700,
+                          color: Colors.grey.shade700,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           '${entry.key}: ${entry.value}',
                           style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
-                            color: Colors.orange.shade700,
+                            color: Colors.grey.shade700,
                           ),
                         ),
                       ],
@@ -356,16 +356,16 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               ],
 
               // Leak locations by file
-              if (_leaksByFile.isNotEmpty) ...<Widget>[
+              if (_concernsByFile.isNotEmpty) ...<Widget>[
                 Text(
-                  '📍 Leak Locations:',
+                  '📍 Memory Retention Locations:',
                   style: (textTheme.labelMedium ?? const TextStyle()).copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.red.shade700,
+                    color: Colors.grey.shade700,
                   ),
                 ),
                 const SizedBox(height: 8),
-                ...(_leaksByFile.entries.map(
+                ...(_concernsByFile.entries.map(
                   (MapEntry<String, List<LeakLocation>> fileEntry) {
                     return _buildFileLeakSection(fileEntry.key, fileEntry.value, textTheme);
                   },
@@ -374,7 +374,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               ],
 
               // Recommendations
-              if (_leakRecommendations.isNotEmpty) ...<Widget>[
+              if (_memoryRecommendations.isNotEmpty) ...<Widget>[
                 Text(
                   '💡 Recommendations:',
                   style: (textTheme.labelMedium ?? const TextStyle()).copyWith(
@@ -383,7 +383,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                ...(_leakRecommendations.map(
+                ...(_memoryRecommendations.map(
                   (String recommendation) => Padding(
                     padding: const EdgeInsets.only(left: 8, bottom: 4),
                     child: Row(
@@ -436,7 +436,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Summary: ${_currentLeakSummary?.toMessage() ?? 'No leaks detected'}',
+                          'Summary: ${_currentMemorySummary?.toMessage() ?? 'No leaks detected'}',
                           style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                             fontFamily: 'monospace',
                             fontSize: 10,
@@ -445,7 +445,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                             color: Colors.grey.shade800,
                           ),
                         ),
-                        if (_currentLeaksDetailed != null && _currentLeaksDetailed!.total > 0) ...<Widget>[
+                        if (_currentMemoryDetailed != null && _currentMemoryDetailed!.total > 0) ...<Widget>[
                           const SizedBox(height: 12),
                           Container(
                             width: double.infinity,
@@ -454,7 +454,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Detailed True Leaks (${_currentLeaksDetailed!.total} items):',
+                            'Detailed Memory Concerns (${_currentMemoryDetailed!.total} items):',
                             style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                               fontFamily: 'monospace',
                               fontSize: 10,
@@ -466,18 +466,18 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                           // True leaks ListView
                           Container(
                             constraints: BoxConstraints(
-                              maxHeight: _currentLeaksDetailed!.all.length > 3 ? 300 : double.infinity,
+                              maxHeight: _currentMemoryDetailed!.all.length > 3 ? 300 : double.infinity,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade50,
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(color: Colors.grey.shade200),
                             ),
-                            child: _currentLeaksDetailed!.all.isEmpty
+                            child: _currentMemoryDetailed!.all.isEmpty
                                 ? Container(
                                     padding: const EdgeInsets.all(16),
                                     child: Text(
-                                      'No detailed leak data available',
+                                      'No detailed memory concern data available',
                                       style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                                         color: Colors.grey.shade600,
                                         fontStyle: FontStyle.italic,
@@ -487,17 +487,17 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                                 : ListView.separated(
                                     shrinkWrap: true,
                                     padding: const EdgeInsets.all(8),
-                                    physics: _currentLeaksDetailed!.all.length > 3
+                                    physics: _currentMemoryDetailed!.all.length > 3
                                         ? const AlwaysScrollableScrollPhysics()
                                         : const NeverScrollableScrollPhysics(),
-                                    itemCount: _currentLeaksDetailed!.all.length,
+                                    itemCount: _currentMemoryDetailed!.all.length,
                                     separatorBuilder: (BuildContext context, int index) => Container(
                                       margin: const EdgeInsets.symmetric(vertical: 8),
                                       height: 1,
                                       color: Colors.grey.shade300,
                                     ),
                                     itemBuilder: (BuildContext context, int index) {
-                                      final LeakReport leak = _currentLeaksDetailed!.all[index];
+                                      final LeakReport leak = _currentMemoryDetailed!.all[index];
                                       return _buildDetailedLeakItem(leak, index + 1, textTheme);
                                     },
                                   ),
@@ -555,7 +555,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                                   ),
                                   child: SingleChildScrollView(
                                     child: Text(
-                                      _currentLeaksDetailed!.toYaml(phasesAreTests: false),
+                                      _currentMemoryDetailed!.toYaml(phasesAreTests: false),
                                       style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                                         fontFamily: 'monospace',
                                         fontSize: 8,
@@ -591,7 +591,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               ),
               const SizedBox(height: 4),
               Text(
-                'All Flutter widgets and controllers are properly disposed. No memory leaks detected.',
+                'All Flutter widgets and controllers are properly disposed. No memory concerns detected.',
                 style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
                   color: Colors.green.shade600,
                   fontSize: 12,
@@ -662,11 +662,11 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                         color: Colors.grey.shade600,
                       ),
                     ),
-                  if (_currentLeaksDetailed != null)
+                  if (_currentMemoryDetailed != null)
                     Text(
-                      'Details: ${_currentLeaksDetailed!.total} true leaks',
+                      'Details: ${_currentMemoryDetailed!.total} active concerns',
                       style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
-                        color: _currentLeaksDetailed!.total > 0 ? Colors.red.shade600 : Colors.green.shade600,
+                        color: _currentMemoryDetailed!.total > 0 ? Colors.grey.shade600 : Colors.green.shade600,
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
                       ),
@@ -682,7 +682,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
 
   String _getStatusDescription() {
     if (!LeakTracking.isStarted) {
-      return 'Leak tracker not initialized';
+      return 'Memory tracker not initialized';
     }
     return 'Non-destructive monitoring active - no automatic GC triggering. Use "Analyze Details" button for deep analysis with GC.';
   }
@@ -704,12 +704,12 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
   /// CONSERVATIVE APPROACH: Only reset when absolutely necessary to preserve user's current page
   bool _shouldResetPagination(Map<String, List<LeakLocation>> newLeaksByFile) {
     // If no previous data, don't reset (initial load)
-    if (_leaksByFile.isEmpty) {
+    if (_concernsByFile.isEmpty) {
       return false;
     }
 
     // Only check if file structure has changed (files added/removed)
-    final Set<String> previousFiles = _leaksByFile.keys.toSet();
+    final Set<String> previousFiles = _concernsByFile.keys.toSet();
     final Set<String> newFiles = newLeaksByFile.keys.toSet();
 
     // Reset only if files were added or removed (structural change)
@@ -719,7 +719,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
 
     // Check for major leak count changes that would affect pagination structure
     for (final String fileName in newFiles) {
-      final int previousCount = _leaksByFile[fileName]?.length ?? 0;
+      final int previousCount = _concernsByFile[fileName]?.length ?? 0;
       final int newCount = newLeaksByFile[fileName]?.length ?? 0;
 
       // Only reset if leak count changed dramatically (>50% AND more than 10 items)
@@ -754,12 +754,12 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
       final int currentPage = entry.value;
 
       // Check if this file still exists
-      if (!_leaksByFile.containsKey(fileName)) {
+      if (!_concernsByFile.containsKey(fileName)) {
         filesToRemove.add(fileName);
         continue;
       }
 
-      final List<LeakLocation> leaks = _leaksByFile[fileName] ?? <LeakLocation>[];
+      final List<LeakLocation> leaks = _concernsByFile[fileName] ?? <LeakLocation>[];
       final int totalPages = _getTotalPages(leaks);
 
       // Only adjust if current page is actually out of bounds
@@ -940,13 +940,13 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
       case 'None':
         return Colors.green;
       case 'Low':
-        return Colors.orange;
+        return Colors.grey.shade600;
       case 'Medium':
-        return Colors.deepOrange;
+        return Colors.grey.shade600;
       case 'High':
-        return Colors.red;
+        return Colors.grey.shade700;
       case 'Critical':
-        return Colors.red.shade900;
+        return Colors.grey.shade800;
       default:
         return Colors.grey;
     }
@@ -1086,8 +1086,8 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: Colors.red.shade300, width: 3)),
-        color: Colors.red.shade50,
+        border: Border(left: BorderSide(color: Colors.grey.shade300, width: 3)),
+        color: Colors.grey.shade50,
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(8),
           bottomRight: Radius.circular(8),
@@ -1099,21 +1099,21 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
           // File header with copy button
           Row(
             children: <Widget>[
-              Icon(Icons.description, size: 16, color: Colors.red.shade700),
+              Icon(Icons.description, size: 16, color: Colors.grey.shade700),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   fileName,
                   style: (textTheme.labelMedium ?? const TextStyle()).copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.red.shade700,
+                    color: Colors.grey.shade700,
                   ),
                 ),
               ),
               if (leaks.isNotEmpty && leaks.first.filePath.isNotEmpty)
                 IconButton(
                   onPressed: () => _copyFilePathToClipboard(context, leaks.first.filePath),
-                  icon: Icon(Icons.copy, size: 14, color: Colors.red.shade600),
+                  icon: Icon(Icons.copy, size: 14, color: Colors.grey.shade600),
                   tooltip: 'Copy file path',
                   visualDensity: VisualDensity.compact,
                   constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
@@ -1147,7 +1147,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               Icon(
                 _getLeakTypeIcon(leak.objectType),
                 size: 14,
-                color: Colors.red.shade600,
+                color: Colors.grey.shade600,
               ),
               const SizedBox(width: 6),
               Expanded(
@@ -1155,7 +1155,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                   leak.objectType,
                   style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.red.shade800,
+                    color: Colors.grey.shade800,
                   ),
                 ),
               ),
@@ -1163,13 +1163,13 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade200,
+                    color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     'Line ${leak.lineNumber}',
                     style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
-                      color: Colors.red.shade800,
+                      color: Colors.grey.shade800,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1182,7 +1182,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
             Text(
               leak.creationLocation,
               style: (textTheme.bodySmall ?? const TextStyle()).copyWith(
-                color: Colors.red.shade600,
+                color: Colors.grey.shade600,
                 fontStyle: FontStyle.italic,
                 fontSize: 11,
               ),
@@ -1195,7 +1195,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               title: Text(
                 'Stack Trace (${leak.stackTrace.length} frames)',
                 style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
-                  color: Colors.red.shade700,
+                  color: Colors.grey.shade700,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1307,7 +1307,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+        border: Border.all(color: Colors.grey.shade700.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1318,13 +1318,13 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade100,
+                  color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '#$itemNumber',
                   style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
-                    color: Colors.red.shade800,
+                    color: Colors.grey.shade800,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),
@@ -1336,7 +1336,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                   leak.type,
                   style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.red.shade800,
+                    color: Colors.grey.shade800,
                     fontSize: 12,
                   ),
                 ),
@@ -1400,7 +1400,9 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                         ),
                         IconButton(
                           onPressed: () => _copyFilePathToClipboard(
-                              context, locationInfo['fullPath'] ?? locationInfo['fileName'] ?? '',),
+                            context,
+                            locationInfo['fullPath'] ?? locationInfo['fileName'] ?? '',
+                          ),
                           icon: Icon(Icons.copy, size: 12, color: Colors.blue.shade600),
                           tooltip: 'Copy file path',
                           visualDensity: VisualDensity.compact,
@@ -1502,9 +1504,9 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                color: Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: Colors.orange.shade200),
+                border: Border.all(color: Colors.grey.shade200),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1513,13 +1515,13 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                     padding: const EdgeInsets.all(8),
                     child: Row(
                       children: <Widget>[
-                        Icon(Icons.call_split, size: 14, color: Colors.orange.shade700),
+                        Icon(Icons.call_split, size: 14, color: Colors.grey.shade700),
                         const SizedBox(width: 6),
                         Text(
                           'Stack Trace (${stackFrames.length} frames)',
                           style: (textTheme.labelMedium ?? const TextStyle()).copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange.shade700,
+                            color: Colors.grey.shade700,
                             fontSize: 10,
                           ),
                         ),
@@ -1542,7 +1544,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                                 fontFamily: 'monospace',
                                 fontSize: 8,
                                 height: 1.2,
-                                color: Colors.orange.shade800,
+                                color: Colors.grey.shade800,
                               ),
                             ),
                           );
@@ -1556,7 +1558,7 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                       child: Text(
                         '... and ${stackFrames.length - 5} more frames',
                         style: (textTheme.labelSmall ?? const TextStyle()).copyWith(
-                          color: Colors.orange.shade600,
+                          color: Colors.grey.shade600,
                           fontSize: 9,
                           fontStyle: FontStyle.italic,
                         ),
@@ -1605,8 +1607,10 @@ class _RealTimeLeakMonitorState extends State<RealTimeLeakMonitor> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: leak.context!.entries
-                            .where((MapEntry<String, dynamic> entry) =>
-                                !<String>['start', 'disposal', 'path'].contains(entry.key.toLowerCase()),)
+                            .where(
+                          (MapEntry<String, dynamic> entry) =>
+                              !<String>['start', 'disposal', 'path'].contains(entry.key.toLowerCase()),
+                        )
                             .map((MapEntry<String, dynamic> entry) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 2),

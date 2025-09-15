@@ -1,6 +1,6 @@
 name: app_monitoring
 description: App monitoring package with performance tracking widgets
-version: 0.0.1
+version: 0.0.2
 publish_to: 'none'
 
 environment:

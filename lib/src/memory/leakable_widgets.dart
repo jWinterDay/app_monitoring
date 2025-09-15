@@ -59,7 +59,7 @@ class LeakableWidgetState extends State<LeakableWidget> with TickerProviderState
       builder: (BuildContext context, Widget? child) => Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.1 + (_animation.value * 0.1)),
+          color: Colors.blueGrey.withValues(alpha: 0.1 + (_animation.value * 0.1)),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(

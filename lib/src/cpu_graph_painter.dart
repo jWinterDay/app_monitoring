@@ -71,7 +71,7 @@ class CpuGraphPainter extends CustomPainter {
     // Add warning indicator for high CPU usage
     if (cpuHistory.isNotEmpty && cpuHistory.last > 80) {
       final Paint warningPaint = Paint()
-        ..color = Colors.red.withValues(alpha: 0.3)
+        ..color = Colors.blueGrey.withValues(alpha: 0.3)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(

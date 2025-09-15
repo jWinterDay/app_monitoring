@@ -216,8 +216,8 @@ class _CircularCpuProfilerState extends State<CircularCpuProfiler> with TickerPr
   Color _getCpuColor() {
     final double percentage = _currentCpuPercent / _maxExpectedCpuPercent;
 
-    if (percentage > 0.9) return Colors.red;
-    if (percentage > 0.7) return Colors.orange;
+    if (percentage > 0.9) return Colors.blueGrey.shade600;
+    if (percentage > 0.7) return Colors.blueGrey.shade400;
     return Colors.blue;
   }
 

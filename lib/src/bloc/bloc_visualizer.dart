@@ -206,8 +206,8 @@ class _BlocVisualizerState extends State<BlocVisualizer> {
       icon: const Icon(Icons.delete_sweep, size: 16),
       label: const Text('Clear All'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red.shade100,
-        foregroundColor: Colors.red.shade700,
+        backgroundColor: Colors.blueGrey.shade100,
+        foregroundColor: Colors.blueGrey.shade700,
         elevation: 0,
       ),
     );
