@@ -71,6 +71,7 @@ class CircularDebugWidgets extends StatefulWidget {
 class _CircularDebugWidgetsState extends State<CircularDebugWidgets> {
   Offset _groupOffset = Offset.zero;
   bool _isBottomSheetOpen = false;
+  bool _hasInitialPositionBeenSet = false;
 
   // Relative positions of widgets within the group
   static const Offset _cpuRelativeOffset = Offset.zero; // CPU at top
@@ -166,13 +167,18 @@ class _CircularDebugWidgetsState extends State<CircularDebugWidgets> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final Size size = MediaQuery.of(context).size;
 
-    // Position the group on the right side, centered vertically
-    _groupOffset = Offset(
-      size.width - 80, // 80px from right edge (adjusted for smaller widgets)
-      (size.height - _groupHeight) * 0.4, // Centered taking total group height into account
-    );
+    // Only set the initial position once, don't reset when keyboard opens/closes
+    if (!_hasInitialPositionBeenSet) {
+      final Size size = MediaQuery.of(context).size;
+
+      // Position the group on the right side, centered vertically
+      _groupOffset = Offset(
+        size.width - 80, // 80px from right edge (adjusted for smaller widgets)
+        (size.height - _groupHeight) * 0.4, // Centered taking total group height into account
+      );
+      _hasInitialPositionBeenSet = true;
+    }
   }
 
   void _handlePanUpdate(DragUpdateDetails details) {
